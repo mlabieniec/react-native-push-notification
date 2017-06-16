@@ -148,19 +148,25 @@ public class RNPushNotificationHelper {
                 }
             }
 
-            String notificationIdString = bundle.getString("id") || bundle.getString("pinpoint.campaign.campaign_id");
+            String notificationIdString = bundle.getString("id");
             if (notificationIdString == null) {
-                Log.e(LOG_TAG, "No notification ID specified for the notification");
-                return;
+                notificationIdString = bundle.getString("pinpoint.campaign.campaign_id");
+                if (notificationIdString == null) {
+                    Log.e(LOG_TAG, "No notification ID specified for the notification");
+                    return;
+                }
             }
 
             Resources res = context.getResources();
             String packageName = context.getPackageName();
 
-            String title = bundle.getString("title") || bundle.getString("pinpoint.notification.title");
+            String title = bundle.getString("title");
             if (title == null) {
-                ApplicationInfo appInfo = context.getApplicationInfo();
-                title = context.getPackageManager().getApplicationLabel(appInfo).toString();
+                title = bundle.getString("pinpoint.notification.title");
+                if (title == null) {
+                    ApplicationInfo appInfo = context.getApplicationInfo();
+                    title = context.getPackageManager().getApplicationLabel(appInfo).toString();
+                }
             }
 
             NotificationCompat.Builder notification = new NotificationCompat.Builder(context)
