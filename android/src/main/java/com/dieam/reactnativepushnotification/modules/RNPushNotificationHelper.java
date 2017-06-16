@@ -136,13 +136,19 @@ public class RNPushNotificationHelper {
                 return;
             }
 
-            if (bundle.getString("message") == null) {
-                // this happens when a 'data' notification is received - we do not synthesize a local notification in this case
-                Log.d(LOG_TAG, "Cannot send to notification centre because there is no 'message' field in: " + bundle);
-                return;
+            String msg = bundle.getString("message");
+
+            if (msg == null) {
+                if (bundle.getString("pinpoint.notification.body")) {
+                    msg = bundle.getString("pinpoint.notification.body");
+                } else {
+                    // this happens when a 'data' notification is received - we do not synthesize a local notification in this case
+                    Log.d(LOG_TAG, "Cannot send to notification centre because there is no 'message' field in: " + bundle);
+                    return;
+                }
             }
 
-            String notificationIdString = bundle.getString("id");
+            String notificationIdString = bundle.getString("id") || bundle.getString("pinpoint.campaign.campaign_id");
             if (notificationIdString == null) {
                 Log.e(LOG_TAG, "No notification ID specified for the notification");
                 return;
@@ -151,7 +157,7 @@ public class RNPushNotificationHelper {
             Resources res = context.getResources();
             String packageName = context.getPackageName();
 
-            String title = bundle.getString("title");
+            String title = bundle.getString("title") || bundle.getString("pinpoint.notification.title");
             if (title == null) {
                 ApplicationInfo appInfo = context.getApplicationInfo();
                 title = context.getPackageManager().getApplicationLabel(appInfo).toString();
@@ -169,7 +175,7 @@ public class RNPushNotificationHelper {
                 notification.setGroup(group);
             }
 
-            notification.setContentText(bundle.getString("message"));
+            notification.setContentText(msg);
 
             String largeIcon = bundle.getString("largeIcon");
 
@@ -219,7 +225,7 @@ public class RNPushNotificationHelper {
             String bigText = bundle.getString("bigText");
 
             if (bigText == null) {
-                bigText = bundle.getString("message");
+                bigText = title;
             }
 
             notification.setStyle(new NotificationCompat.BigTextStyle().bigText(bigText));
