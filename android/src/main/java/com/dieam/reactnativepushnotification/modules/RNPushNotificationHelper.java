@@ -139,12 +139,11 @@ public class RNPushNotificationHelper {
             String msg = bundle.getString("message");
 
             if (msg == null) {
-                if (bundle.getString("pinpoint.notification.body")) {
-                    msg = bundle.getString("pinpoint.notification.body");
-                } else {
+                msg = bundle.getString("pinpoint.notification.body");
+                if (msg == null) {
                     // this happens when a 'data' notification is received - we do not synthesize a local notification in this case
                     Log.d(LOG_TAG, "Cannot send to notification centre because there is no 'message' field in: " + bundle);
-                    return;
+                    return;   
                 }
             }
 
